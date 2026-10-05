@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dehla Pakad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a3d22">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+<div id="table">
+  <div class="rim"></div>
+
+  <!-- Top-left: trump + score -->
+  <aside id="hud">
+    <div id="trump-badge" class="panel">
+      <div class="trump-sym" id="trump-sym">?</div>
+      <div>
+        <div class="label">Trump</div>
+        <div class="trump-name" id="trump-name">Not called</div>
+        <div class="sub" id="trump-caller"></div>
+      </div>
+    </div>
+    <div id="score" class="panel">
+      <div class="team-row" id="team-0">
+        <div class="team-name"><span class="dot t0"></span>You &amp; North</div>
+        <div class="tens" id="tens-0"></div>
+        <div class="tricks"><b id="tricks-0">0</b><span>tricks</span></div>
+      </div>
+      <div class="team-row" id="team-1">
+        <div class="team-name"><span class="dot t1"></span>West &amp; East</div>
+        <div class="tens" id="tens-1"></div>
+        <div class="tricks"><b id="tricks-1">0</b><span>tricks</span></div>
+      </div>
+      <div class="tally" id="tally"></div>
+    </div>
+  </aside>
+
+  <!-- Top-right: controls (on phones: behind the menu button) -->
+  <button id="btn-menu" class="btn mobile-only" aria-label="Menu" aria-expanded="false">&#9776;</button>
+  <nav id="controls" class="panel">
+    <button id="btn-new" class="btn primary">New hand</button>
+    <button id="btn-reset" class="btn" title="Clear the session score and start over">Reset</button>
+    <button id="btn-hint" class="btn" disabled>Hint</button>
+    <button id="btn-last" class="btn" disabled>Last trick</button>
+    <label class="switch" title="Show the AI players' cards">
+      <input type="checkbox" id="reveal"><span class="track"><span class="knob"></span></span>Show all hands
+    </label>
+    <label class="select">AI
+      <select id="think">
+        <option value="0.5">Quick (0.5s)</option>
+        <option value="1.5">Normal (1.5s)</option>
+        <option value="4">Strong (4s)</option>
+        <option value="8">Max (8s)</option>
+      </select>
+    </label>
+    <label class="select" title="Switching rules deals a new hand">Rules
+      <select id="variant">
+        <option value="classic">Classic</option>
+        <option value="streak">Two in a row</option>
+      </select>
+    </label>
+    <button id="btn-rules" class="btn ghost" title="Rules">?</button>
+  </nav>
+
+  <div id="last-trick" class="panel popover hidden"></div>
+
+  <!-- Seats -->
+  <section class="seat seat-north" id="seat-2">
+    <div class="hand hand-h small" id="hand-2"></div>
+    <div class="plate" id="plate-2"></div>
+  </section>
+  <section class="seat seat-west" id="seat-1">
+    <div class="plate" id="plate-1"></div>
+    <div class="hand hand-v small" id="hand-1"></div>
+  </section>
+  <section class="seat seat-east" id="seat-3">
+    <div class="plate" id="plate-3"></div>
+    <div class="hand hand-v small" id="hand-3"></div>
+  </section>
+
+  <div id="trick">
+    <div id="deck" class="hidden"><div class="card back"></div><div class="card back"></div><div class="card back"></div></div>
+    <div id="pot" class="hidden" title="Cards waiting in the middle: the next player to win two tricks in a row collects them">
+      <div class="pot-stack"></div>
+      <div class="pot-label"></div>
+      <div class="pot-tens"></div>
+    </div>
+  </div>
+
+  <section class="seat seat-south" id="seat-0">
+    <div class="south-bar">
+      <div class="plate" id="plate-0"></div>
+      <div id="status" class="status"></div>
+      <button id="btn-hint-m" class="btn mobile-only" disabled>Hint</button>
+    </div>
+    <div class="hand hand-fan" id="hand-0"></div>
+  </section>
+
+  <!-- Overlays -->
+  <div id="trump-picker" class="panel picker hidden">
+    <h2>Call trump</h2>
+    <p>You are on the dealer's left. Pick trump from your first five cards.</p>
+    <div class="suit-buttons" id="suit-buttons"></div>
+    <button class="btn ghost small" id="btn-trump-hint">Ask the AI what it would call</button>
+  </div>
+
+  <div id="announce" class="hidden"></div>
+  <div id="toasts"></div>
+
+  <div id="modal" class="modal hidden"><div class="modal-card panel" id="modal-card"></div></div>
+</div>
+<script>window.DEHLA_STANDALONE = true;</script>
+<script src="static/app.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  // A newer version took over: apply it at the next deal (never mid-hand).
+  const hadVersion = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadVersion) window.DEHLA_UPDATE_READY = true;
+  });
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
